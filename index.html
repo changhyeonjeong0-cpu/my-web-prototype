@@ -1,59 +1,51 @@
-﻿<!DOCTYPE html>
-<html lang = "ko">
+html
+
+<!DOCTYPE html>
+<html lang="ko">
 <head>
-<meta charset = "UTF-8">
-<title>차량 보안 프로토타입< / title>
-<style>
-body{ font - family: 'Arial', sans - serif; text - align: center; background - color: #f0f2f5; padding - top: 100px; }
-.car - card{ background: white; padding: 30px; border - radius: 15px; display: inline - block; box - shadow: 0 4px 10px rgba(0,0,0,0.1); }
-input{ padding: 10px; font - size: 18px; width: 150px; text - align: center; border: 2px solid #ccc; border - radius: 5px; }
-button{ padding: 10px 25px; font - size: 18px; background - color: #007bff; color: white; border: none; border - radius: 5px; cursor: pointer; margin - left: 10px; }
-button:hover{ background - color: #0056b3; }
-#status{ margin - top: 20px; font - size: 20px; font - weight: bold; }
-.secure{ color: green; }
-.danger{ color: red; }
-< / style>
-< / head>
+    <meta charset="UTF-8">
+    <title>차량 보안 프로토타입</title>
+    <style>
+        body { font-family: 'Arial', sans-serif; text-align: center; background-color: #f0f2f5; padding-top: 100px; }
+        .car-card { background: white; padding: 30px; border-radius: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        input { padding: 10px; font-size: 18px; width: 150px; text-align: center; border: 2px solid #ccc; border-radius: 5px; }
+        button { padding: 10px 25px; font-size: 18px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px; }
+        button:hover { background-color: #0056b3; }
+        #status { margin-top: 20px; font-size: 20px; font-weight: bold; }
+        .secure { color: green; }
+        .danger { color: red; }
+    </style>
+</head>
 <body>
-
-<div class = "car-card">
-<h1>🚗 스마트 키 시스템< / h1>
-<p>차량 잠금을 해제하려면 < b>4자리 PIN< / b>을 입력하세요.< / p>
-
-<input type = "password" id = "pinInput" maxlength = "4" placeholder = "****">
-<button onclick = "checkSecurity()">잠금 해제< / button>
-
-<div id = "status">상태: 대기 중...< / div>
-< / div>
-
-<script>
-// 실제 보안 환경에서는 서버에 저장되지만, 프로토타입용으로 설정한 비밀번호입니다.
-const CORRECT_PIN = "1234";
-let attemptCount = 0; // 보안 기능: 시도 횟수 제한
-
-function checkSecurity() {
-    const userInput = document.getElementById('pinInput').value;
-    const statusDiv = document.getElementById('status');
-
-    if (userInput == = CORRECT_PIN) {
-        statusDiv.innerHTML = "🔓 인증 성공: 차량 문이 열렸습니다.";
-        statusDiv.className = "secure";
-        attemptCount = 0; // 성공 시 횟수 초기화
-    }
-    else {
-        attemptCount++;
-        statusDiv.innerHTML = `⚠️ 인증 실패!(오류 횟수 : ${ attemptCount } / 3)`;
-            statusDiv.className = "danger";
-
-        // 보안 로직: 3회 이상 틀리면 시스템 잠금
-        if (attemptCount >= 3) {
-            statusDiv.innerHTML = "🚫 보안 위협 감지: 시스템이 1분간 잠깁니다.";
-            document.getElementById('pinInput').disabled = true;
-            document.querySelector('button').disabled = true;
+    <div class="car-card">
+        <h1>🚗 스마트 키 시스템</h1>
+        <p>차량 잠금을 해제하려면 <b>4자리 PIN</b>을 입력하세요.</p>
+        <input type="password" id="pinInput" maxlength="4" placeholder="****">
+        <button onclick="checkSecurity()">잠금 해제</button>
+        <div id="status">상태: 대기 중...</div>
+    </div>
+    <script>
+        const CORRECT_PIN = "1234"; 
+        let attemptCount = 0; 
+        function checkSecurity() {
+            const userInput = document.getElementById('pinInput').value;
+            const statusDiv = document.getElementById('status');
+            if (userInput === CORRECT_PIN) {
+                statusDiv.innerHTML = "🔓 인증 성공: 차량 문이 열렸습니다.";
+                statusDiv.className = "secure";
+                attemptCount = 0; 
+            } else {
+                attemptCount++;
+                statusDiv.innerHTML = `⚠️ 인증 실패! (오류 횟수: ${attemptCount}/3)`;
+                statusDiv.className = "danger";
+                if (attemptCount >= 3) {
+                    statusDiv.innerHTML = "🚫 보안 위협 감지: 시스템이 잠깁니다.";
+                    document.getElementById('pinInput').disabled = true;
+                    document.querySelector('button').disabled = true;
+                }
+            }
+            document.getElementById('pinInput').value = ""; 
         }
-    }
-    document.getElementById('pinInput').value = ""; // 입력창 초기화
-}
-< / script>
-< / body>
-< / html>
+    </script>
+</body>
+</html>
