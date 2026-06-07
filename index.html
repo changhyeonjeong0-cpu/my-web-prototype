@@ -3,16 +3,24 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>차량 보안 프로토타입</title>
+    <title>차량 보안 및 웰컴 프로토타입</title>
     <style>
-        body { font-family: 'Arial', sans-serif; text-align: center; background-color: #f0f2f5; padding-top: 100px; }
-        .car-card { background: white; padding: 30px; border-radius: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        body { font-family: 'Arial', sans-serif; text-align: center; background-color: #f0f2f5; padding-top: 50px; }
+        .car-card { background: white; padding: 30px; border-radius: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 350px; }
         input { padding: 10px; font-size: 18px; width: 150px; text-align: center; border: 2px solid #ccc; border-radius: 5px; }
-        button { padding: 10px 25px; font-size: 18px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px; }
+        button { padding: 10px 25px; font-size: 18px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
         button:hover { background-color: #0056b3; }
-        #status { margin-top: 20px; font-size: 20px; font-weight: bold; }
+        #status { margin-top: 20px; font-size: 18px; font-weight: bold; }
         .secure { color: green; }
         .danger { color: red; }
+        
+        /* 대시보드 스타일 추가 */
+        .dashboard { margin-top: 25px; padding-top: 20px; border-top: 2px dashed #ccc; text-align: left; display: none; }
+        .info-item { margin: 10px 0; font-size: 16px; }
+        .badge { padding: 3px 8px; border-radius: 5px; color: white; font-weight: bold; font-size: 14px; }
+        .bg-blue { background-color: #007bff; }
+        .bg-red { background-color: #dc3545; }
+        .bg-gray { background-color: #6c757d; }
     </style>
 </head>
 <body>
@@ -20,9 +28,19 @@
         <h1>🚗 스마트 키 시스템</h1>
         <p>차량 잠금을 해제하려면 <b>4자리 PIN</b>을 입력하세요.</p>
         <input type="password" id="pinInput" maxlength="4" placeholder="****">
+        <br>
         <button onclick="checkSecurity()">잠금 해제</button>
         <div id="status">상태: 대기 중...</div>
+
+        <!-- 인증 성공 시 나타날 가상 차량 대시보드 -->
+        <div id="dashboard" class="dashboard">
+            <h3>📊 차량 정보 시스템</h3>
+            <div class="info-item">⛅ 외기 온도: <span id="weatherTemp">0</span>°C</div>
+            <div class="info-item">🌬️ 공조 장치: <span id="acStatus" class="badge">꺼짐</span></div>
+            <div class="info-item">♨️ 시트 열선: <span id="heaterStatus" class="badge">꺼짐</span></div>
+        </div>
     </div>
+
     <script>
         const CORRECT_PIN = "1234"; 
         let attemptCount = 0; 
@@ -30,23 +48,27 @@
         function checkSecurity() {
             const userInput = document.getElementById('pinInput').value;
             const statusDiv = document.getElementById('status');
+            const dashboardDiv = document.getElementById('dashboard');
 
             if (userInput === CORRECT_PIN) {
                 statusDiv.innerHTML = "🔓 인증 성공: 차량 문이 열렸습니다.";
                 statusDiv.className = "secure";
                 attemptCount = 0; 
+
+                // 날씨 연동 제어 함수 호출
+                controlClimate();
+                dashboardDiv.style.display = "block"; // 대시보드 표시
             } else {
                 attemptCount++;
                 statusDiv.innerHTML = `⚠️ 인증 실패! (오류 횟수: ${attemptCount}/3)`;
                 statusDiv.className = "danger";
+                dashboardDiv.style.display = "none"; // 실패 시 대시보드 숨김
 
-                // 이 부분이 타이머 기능으로 교체되었습니다.
                 if (attemptCount >= 3) {
                     statusDiv.innerHTML = "🚫 보안 위협 감지: 30초간 시스템이 잠깁니다.";
                     document.getElementById('pinInput').disabled = true;
                     document.querySelector('button').disabled = true;
 
-                    // 30초 뒤에 실행
                     setTimeout(function() {
                         attemptCount = 0; 
                         document.getElementById('pinInput').disabled = false; 
@@ -57,8 +79,39 @@
                     }, 30000); 
                 }
             }
-            // 코드 마지막에 입력창을 비워주는 기능도 그대로 유지됩니다.
             document.getElementById('pinInput').value = ""; 
+        }
+
+        // 가상 날씨 데이터 생성 및 공조 장치 제어 함수
+        function controlClimate() {
+            // -10도에서 35도 사이의 랜덤 온도 생성
+            const randomTemp = Math.floor(Math.random() * 46) - 10; 
+            
+            const tempEl = document.getElementById('weatherTemp');
+            const acEl = document.getElementById('acStatus');
+            const heaterEl = document.getElementById('heaterStatus');
+
+            tempEl.innerText = randomTemp;
+
+            if (randomTemp >= 25) {
+                // 25도 이상 더운 날씨 -> 에어컨 가동
+                acEl.innerText = "에어컨 가동 중 (22°C 설정)";
+                acEl.className = "badge bg-blue";
+                heaterEl.innerText = "꺼짐";
+                heaterEl.className = "badge bg-gray";
+            } else if (randomTemp <= 5) {
+                // 5도 이하 추운 날씨 -> 히터 및 열선 가동
+                acEl.innerText = "꺼짐";
+                acEl.className = "badge bg-gray";
+                heaterEl.innerText = "히터 및 핸들/시트 열선 가동 중";
+                heaterEl.className = "badge bg-red";
+            } else {
+                // 6도 ~ 24도 쾌적한 날씨 -> 송풍 모드
+                acEl.innerText = "송풍 모드 가동 중";
+                acEl.className = "badge bg-blue";
+                heaterEl.innerText = "꺼짐";
+                heaterEl.className = "badge bg-gray";
+            }
         }
     </script>
 </body>
