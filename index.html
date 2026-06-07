@@ -26,9 +26,11 @@
     <script>
         const CORRECT_PIN = "1234"; 
         let attemptCount = 0; 
+
         function checkSecurity() {
             const userInput = document.getElementById('pinInput').value;
             const statusDiv = document.getElementById('status');
+
             if (userInput === CORRECT_PIN) {
                 statusDiv.innerHTML = "🔓 인증 성공: 차량 문이 열렸습니다.";
                 statusDiv.className = "secure";
@@ -37,12 +39,25 @@
                 attemptCount++;
                 statusDiv.innerHTML = `⚠️ 인증 실패! (오류 횟수: ${attemptCount}/3)`;
                 statusDiv.className = "danger";
+
+                // 이 부분이 타이머 기능으로 교체되었습니다.
                 if (attemptCount >= 3) {
-                    statusDiv.innerHTML = "🚫 보안 위협 감지: 시스템이 잠깁니다.";
+                    statusDiv.innerHTML = "🚫 보안 위협 감지: 30초간 시스템이 잠깁니다.";
                     document.getElementById('pinInput').disabled = true;
                     document.querySelector('button').disabled = true;
+
+                    // 30초 뒤에 실행
+                    setTimeout(function() {
+                        attemptCount = 0; 
+                        document.getElementById('pinInput').disabled = false; 
+                        document.querySelector('button').disabled = false;    
+                        document.getElementById('pinInput').value = "";        
+                        statusDiv.innerHTML = "상태: 대기 중...";
+                        statusDiv.className = ""; 
+                    }, 30000); 
                 }
             }
+            // 코드 마지막에 입력창을 비워주는 기능도 그대로 유지됩니다.
             document.getElementById('pinInput').value = ""; 
         }
     </script>
